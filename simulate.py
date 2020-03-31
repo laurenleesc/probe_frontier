@@ -12,14 +12,16 @@ def generateNormalVariables(n, p):
     for j in range(p):
         #np.random.seed(seed = j)   #seed for distribution
         #random.seed(j)   #seed for random number generator
-        X[j] = np.random.normal(0, 1, n)
+        X[j] = np.random.normal(0, 1/np.sqrt(n), n) # NOTE: ADDED 1/SQRT(N) SCALING 3/31
     return X
 
 def generateX(n,p):
     
     # Initialize dataframe with an intercept column
-    intercept = np.repeat(1,n) # Create n 1's for intercept column
-    X = pd.DataFrame(intercept.reshape(n,1))
+    #intercept = np.repeat(1,n) # Create n 1's for intercept column
+    #X = pd.DataFrame(intercept.reshape(n,1))
+    # COMMENTED OUT INTERCEPT FOR TIME BEING. CAUSING ISSUES WITH SIGNAL STRENGTH SCALING
+    X = pd.DataFrame()
     
     # Generate data
     if p != 0:
@@ -73,7 +75,7 @@ def generateResponseVariable(X, beta, dist):
     
     return meanValues, y
 
-def generateData(dist, n, p, mu, stdev):
+def generateData(dist, n, p, mu, stdev, signal_strength):
     
     # Generate Data
     X = generateX(n=n, p=p)
@@ -81,13 +83,15 @@ def generateData(dist, n, p, mu, stdev):
     # Generate Betas
     q = X.shape[1]
     beta = generateRandomBeta(q=q, mu=mu, stdev=stdev)
+    beta_norm_squared = beta.T.dot(beta).values[0,0]
+    beta_scaled = beta * np.sqrt((n * signal_strength) / beta_norm_squared)
 
     # Generate Response Variable (and associated means - what goes into the link fn)
-    means, y = generateResponseVariable(X=X, beta=beta, dist=dist) ### dist means pass distribution name as string
+    means, y = generateResponseVariable(X=X, beta=beta_scaled, dist=dist) ### dist means pass distribution name as string
     
     # Make sure we return numpy arrays (easier to work with later and all names are useless here anyway)
-    beta = np.squeeze(np.array(beta))
+    beta_scaled = np.squeeze(np.array(beta_scaled))
     X = np.array(X)
     y = np.array(y)    
     
-    return X, beta, y, means
+    return X, beta_scaled, y, means
