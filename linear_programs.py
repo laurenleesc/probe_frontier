@@ -16,9 +16,20 @@ def checkMleExistence(data):
         v+= [m.addVar(-GRB.INFINITY,GRB.INFINITY,0,GRB.CONTINUOUS,"v"+str(i))]
     m.update()
     
+    
+    
+    float32_epsilon = (np.finfo(np.float32).eps)*10 
+            ### We wanted strict inequality, but Gurobi can not handle strict inequality
+            # So, Had to use machine epsilon as reference. However, machine epsilon turned out to be too small
+            # So, we used ten times machine epsilon
+            # Machine epsilon can be considered as the smallest number greater than zero.
+            # https://kite.com/python/answers/how-to-find-machine-epsilon-using-numpy-in-python
+            
+            
+            
     # Constraints
     for i in range(n):
-        m.addConstr(y[i]*(X.iloc[i].dot(v))>=0)
+        m.addConstr(y[i]*(X.iloc[i].dot(v))>=float32_epsilon)
     m.update()
     
     
