@@ -37,6 +37,6 @@ def checkMleExistence(data):
     m.optimize() # Run the model
     
     
-    return GRB.OPTIMAL # Gurobi status: 3=LP is infeasible, 2 = Optimul solution reached, and many others
+    return m.Status # Gurobi status: 3=LP is infeasible, 2 = Optimul solution reached, and many others
 
   
