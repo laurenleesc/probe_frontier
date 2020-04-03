@@ -14,8 +14,12 @@ def checkMleExistence(data):
     # Define variables and add to objective function
     for i in range(p):
         v+= [m.addVar(-GRB.INFINITY,GRB.INFINITY,0,GRB.CONTINUOUS,"v"+str(i))]
+
+    v+= [m.addVar(-GRB.INFINITY,GRB.INFINITY,0,GRB.CONTINUOUS,"c")]
     m.update()
     
+    
+    X['ones'] = np.ones(n)
     
     
     float32_epsilon = (np.finfo(np.float32).eps)*10 
@@ -29,14 +33,17 @@ def checkMleExistence(data):
             
     # Constraints
     for i in range(n):
-        m.addConstr(y[i]*(X.iloc[i].dot(v))>=float32_epsilon)
+        if y[i]>0:
+            m.addConstr(y[i]*((X.iloc[i]).dot(v))>= 0)
+        else:
+            m.addConstr(y[i]*((X.iloc[i]).dot(v))>= float32_epsilon)
+
     m.update()
     
     
+    # m.ModelSense = -1 # To Maximize instead of Minimize
     m.Params.OutputFlag = 0 # To avoid verbose output of m.optimize()
     m.optimize() # Run the model
-    
-    
     return m.Status # Gurobi status: 3=LP is infeasible, 2 = Optimul solution reached, and many others
 
   
