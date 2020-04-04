@@ -19,32 +19,23 @@ def checkMleExistence(data):
     m.update()
     
     
-    X['ones'] = np.ones(n)
-    
-    
-    float32_epsilon = (np.finfo(np.float32).eps)*10 
-            ### We wanted strict inequality, but Gurobi can not handle strict inequality
-            # So, Had to use machine epsilon as reference. However, machine epsilon turned out to be too small
-            # So, we used ten times machine epsilon
-            # Machine epsilon can be considered as the smallest number greater than zero.
-            # https://kite.com/python/answers/how-to-find-machine-epsilon-using-numpy-in-python
-            
+    X['ones'] = np.ones(n)      
             
             
     # Constraints
-    # We want complete separation, this is the reason we are keeping a buffer zone of float epsilon (a very small number)
-    # But the epsilon keeps two groups completely separated.
+    # The right hand side of the constraints does not matter, because of the constant c on the LHS. They adjsust
+    # However, these constraints find complete separability
     for i in range(n):
         if y[i]>0:
-            m.addConstr(((X.iloc[i]).dot(v))>= 0)
+            m.addConstr(((X.iloc[i]).dot(v))>= 1)
         else:
-            m.addConstr(((X.iloc[i]).dot(v))<= -1*float32_epsilon)
+            m.addConstr(((X.iloc[i]).dot(v))<= -1)
     
 
     m.update()
     
     
-    # m.ModelSense = -1 # To Maximize instead of Minimize
+#     m.ModelSense = -1 # To Maximize instead of Minimize
     m.Params.OutputFlag = 0 # To avoid verbose output of m.optimize()
     m.optimize() # Run the model
     return m.Status # Gurobi status: 3=LP is infeasible, 2 = Optimul solution reached, and many others
