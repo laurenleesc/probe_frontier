@@ -15,7 +15,7 @@ def checkMleExistence(data):
     for i in range(p):
         v+= [m.addVar(-GRB.INFINITY,GRB.INFINITY,0,GRB.CONTINUOUS,"v"+str(i))]
 
-    v+= [m.addVar(-GRB.INFINITY,GRB.INFINITY,0,GRB.CONTINUOUS,"c")]
+    v+= [m.addVar(-GRB.INFINITY,GRB.INFINITY,0,GRB.CONTINUOUS,"c")]# This is the variable, that will hold the constant c
     m.update()
     
     
@@ -32,11 +32,14 @@ def checkMleExistence(data):
             
             
     # Constraints
+    # We want complete separation, this is the reason we are keeping a buffer zone of float epsilon (a very small number)
+    # But the epsilon keeps two groups completely separated.
     for i in range(n):
         if y[i]>0:
             m.addConstr(y[i]*((X.iloc[i]).dot(v))>= 0)
         else:
             m.addConstr(y[i]*((X.iloc[i]).dot(v))>= float32_epsilon)
+    
 
     m.update()
     
