@@ -36,9 +36,9 @@ def checkMleExistence(data):
     # But the epsilon keeps two groups completely separated.
     for i in range(n):
         if y[i]>0:
-            m.addConstr(y[i]*((X.iloc[i]).dot(v))>= 0)
+            m.addConstr(((X.iloc[i]).dot(v))>= 0)
         else:
-            m.addConstr(y[i]*((X.iloc[i]).dot(v))>= float32_epsilon)
+            m.addConstr(((X.iloc[i]).dot(v))<= -1*float32_epsilon)
     
 
     m.update()
