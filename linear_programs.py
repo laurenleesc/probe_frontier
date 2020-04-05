@@ -26,10 +26,7 @@ def checkMleExistence(data):
     # The right hand side of the constraints does not matter, because of the constant c on the LHS. They adjsust
     # However, these constraints find complete separability
     for i in range(n):
-        if y[i]>0:
-            m.addConstr(((X.iloc[i]).dot(v))>= 1)
-        else:
-            m.addConstr(((X.iloc[i]).dot(v))<= -1)
+        m.addConstr(y[i]*((X.iloc[i]).dot(v))>= 1)
     
 
     m.update()
